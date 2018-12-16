@@ -2,6 +2,7 @@ import os
 import configparser
 import math
 import numpy as np
+import heapq
 import json
 
 class VAFile(object):
@@ -15,6 +16,7 @@ class VAFile(object):
 		self.num_bit = num_bit
 		self.data_range = data_range
 		b = self.num_bit % self.num_dim
+		self.cands = []
 		self.bjs = []
 		for j in range(self.num_dim):
 			if idx<=b:
@@ -62,9 +64,9 @@ class VAFile(object):
 			partition.append(1)
 
 		for data_tuple in bulk_data:
-			if not check_valid(data_tuple):
+			if not self.check_valid(data_tuple):
 				return False
-			appro_list = approximate(self, data_tuple)
+			appro_list = self.approximate(self, data_tuple)
 			seperator = ''
 			appro = seperator.join(appro_list)
 			if appro not in self.boxes:
@@ -73,18 +75,6 @@ class VAFile(object):
 			box.append(data_tuple)
 
 		return True
-
-	# def insert_tuple(self, data_tuple):
-
-	# 	return True;
-
-	# def delete_tuple(self, data_tuple):
-
-	# 	return True;
-
-	# def update_file(self):
-
-	# 	return True
 
 	def check_valid(self, data_tuple):
 
@@ -99,7 +89,7 @@ class VAFile(object):
 
 	def approximate(self, data_tuple):
 
-		if not check_valid(data_tuple)
+		if not self.check_valid(data_tuple)
 			return False
 		appro_list = []
 		for idx, data in enumerate(data_tuple):
@@ -123,22 +113,77 @@ class VAFile(object):
 		binary_data = format(mark, '0' + str(bj) + 'b')
 		return binary_data
 
-	def nearest_search(self, pivot_tuple, num_nearest):
+	def nearest_search(self, p, pivot_tuple, num_nearest):
 
 		tuple_list = []
-		if not check_valid(pivot_tuple):
+		if not self.check_valid(pivot_tuple):
 			return tuple_list
+		k = num_nearest
 
-		return tuple_list
+		delta = self.init_candidate(k,self.num_dim)
+		hp = []
+		heapq.heapify(hp)
+		lb, ub = self.get_bounds(p, pivot_tuple)
+		for box in self.boxes:
+			li = lb['box']
+			ui = ub['box']
+			if li < delta:
+				delta = self.candidate(ui)
+				heapq.heappush(hp, (li,box))
 
-	def lower_bound(self, pivot_tuple):
+		delta = self.init_candidate(k,delta)
+		li, box = heapq.heappop(hp)
+		while li < delta:
+			for data_tuple in self.boxes[box]:
+				delta = self.candidate(self.distance(p, pivot_tuple, data_tuple))
+			li, box = = pop_heap(hp)
+
+		return self.cands
+
+	def init_candidate(self, size, value):
+		self.cands.clear()
+		for i in range(size):
+			self.cands.append(value)
+
+		return self.cands[-1]
+
+	def candidate(self, dist):
+		left = 0
+		right = len(self.cands)-1
+		while left<=right:
+			mid = left + (right-left)//2
+			if self.cands[mid]>=dist:
+				right = mid
+			else:
+				left = mid+1
+		if left>right:
+			return self.cands[-1]
+
+		for i in range(len(self.cands)-1, left, -1):
+			self.cands[i] = self.cands[i-1]
+		self.cands[left] = dist
+
+		return self.cands[-1]
+
+
+	def get_bounds(self, p, pivot_tuple):
+
+		lb = self.lower_bound(pivot_tuple)
+		ub = self.upper_bound(pivot_tuple)
+
+		return lb, ub
+
+	def lower_bound(self, p, pivot_tuple):
 
 		lb = {}
 		for box in self.boxes:
 			element = []
 			for i in range(self.num_dim):
-				rij = int(box, 2)
+				index = sum(self.bjs[:i])
+				dim_box = box[index:index+bjs[i]]
+				rij = int(dim_box, 2)
 				marks = partitions[i]
+				qj = pivot_tuple[i]
 				if rqj>rij:
 					diff = qj - marks[rij+1]
 				elif rqj==rij:
@@ -152,14 +197,17 @@ class VAFile(object):
 
 		return lb
 
-	def upper_bound(self, pivot_tuple):
+	def upper_bound(self, p, pivot_tuple):
 
 		ub = {}
 		for box in self.boxes:
 			element = []
 			for i in range(self.num_dim):
-				rij = int(box, 2)
+				index = sum(self.bjs[:i])
+				dim_box = box[index:index+bjs[i]]
+				rij = int(dim_box, 2)
 				marks = partitions[i]
+				qj = pivot_tuple[i]
 				if rqj>rij:
 					diff = qj - marks[rij]
 				elif rqj==rij:
