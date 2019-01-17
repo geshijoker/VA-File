@@ -12,3 +12,6 @@ The implementation is based on the [paper](https://pdfs.semanticscholar.org/63ea
 * data range in each dimension (0,1)
 * 2 bits of digits in each dimension
 * number of dimensions range from 3 to 40
+
+# result
+The implementation details and comparison with R*-tree is in _report.pdf_
