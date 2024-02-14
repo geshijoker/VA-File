@@ -1,5 +1,5 @@
 ## VA-File
-This is an implementation of VA-File for studying and comparing the performance of searching in high-dimensional vector spaces. 
+This is an implementation of VA-File for studying and comparing the performance of searching in high-dimensional vector spaces. The empirical technique [report](https://github.com/geshijoker/VA-File/blob/master/va-file.pdf) is based on the implementation in this repository.
 
 # Dependencies
 * pickle
