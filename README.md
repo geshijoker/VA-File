@@ -1,5 +1,5 @@
 ## VA-File
-This is an implementation of VA-File for studying and comparing the performance of searching in high-dimensional vector spaces. The empirical technique [report](https://github.com/geshijoker/VA-File/blob/master/va-file.pdf) is based on the implementation in this repository.
+This is an implementation of VA-File for studying and comparing the performance of searching in high-dimensional vector spaces. 
 
 # Dependencies
 * pickle
@@ -14,4 +14,4 @@ The implementation is based on the [paper](https://pdfs.semanticscholar.org/63ea
 * number of dimensions range from 3 to 40
 
 # result
-The implementation details and comparison with R*-tree is in _report.pdf_
+The implementation details and comparison with R*-tree is in [va-file.pdf](https://github.com/geshijoker/VA-File/blob/master/va-file.pdf)
